@@ -31,10 +31,6 @@ class Item(BaseModel):
 
 
 # Root route
-@app.get("/")
-def read_root():
-    return {"message": "FastAPI + Supabase REST API is running 🚀"}
-
 @app.get("/", response_class=HTMLResponse)
 def serve_home():
     with open("index.html", "r", encoding="utf-8") as f:
