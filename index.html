@@ -1,23 +1,204 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>FastAPI Supabase CRUD</title>
+<meta charset="UTF-8">
+<title>FastAPI CRUD UI</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #1e1e1e;
+    color: #fff;
+    padding: 20px;
+}
+
+h1 {
+    color: #4CAF50;
+}
+
+.section {
+    border: 1px solid #444;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #2a2a2a;
+}
+
+input {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 4px;
+    border: none;
+}
+
+button {
+    padding: 8px 12px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.get { background: #2196F3; }
+.post { background: #4CAF50; }
+.put { background: #FFC107; color: black; }
+.patch { background: #9C27B0; }
+.delete { background: #F44336; }
+
+pre {
+    background: #000;
+    padding: 10px;
+    overflow-x: auto;
+    border-radius: 6px;
+}
+</style>
+
 </head>
 <body>
-    <h1>FastAPI + Supabase CRUD API</h1>
 
-    <p>API is running 🚀</p>
+<h1>🚀 FastAPI CRUD Interface</h1>
 
-    <h3>Swagger Docs:</h3>
-    <a href="/docs" target="_blank">Open Swagger UI</a>
+<!-- CREATE -->
+<div class="section">
+<h2>POST /items</h2>
+<input id="post-name" placeholder="Name">
+<input id="post-desc" placeholder="Description">
+<button class="post" onclick="createItem()">Create</button>
+</div>
 
-    <h3>Endpoints:</h3>
-    <ul>
-        <li>GET /items</li>
-        <li>POST /items</li>
-        <li>GET /items/{id}</li>
-        <li>PUT /items/{id}</li>
-        <li>DELETE /items/{id}</li>
-    </ul>
+<!-- GET -->
+<div class="section">
+<h2>GET /items</h2>
+<button class="get" onclick="getItems()">Fetch All</button>
+
+<h3>GET /items/{id}</h3>
+<input id="get-id" placeholder="ID">
+<button class="get" onclick="getItem()">Fetch One</button>
+</div>
+
+<!-- PUT -->
+<div class="section">
+<h2>PUT /items/{id}</h2>
+<input id="put-id" placeholder="ID">
+<input id="put-name" placeholder="Name">
+<input id="put-desc" placeholder="Description">
+<button class="put" onclick="updateItem()">Replace</button>
+</div>
+
+<!-- PATCH -->
+<div class="section">
+<h2>PATCH /items/{id}</h2>
+<input id="patch-id" placeholder="ID">
+<input id="patch-name" placeholder="Name (optional)">
+<input id="patch-desc" placeholder="Description (optional)">
+<button class="patch" onclick="patchItem()">Update</button>
+</div>
+
+<!-- DELETE -->
+<div class="section">
+<h2>DELETE /items/{id}</h2>
+<input id="delete-id" placeholder="ID">
+<button class="delete" onclick="deleteItem()">Delete</button>
+</div>
+
+<!-- OUTPUT -->
+<div class="section">
+<h2>Response</h2>
+<pre id="output">No requests yet...</pre>
+</div>
+
+<script>
+const API = "/items";
+
+function showResponse(status, data) {
+    document.getElementById("output").textContent =
+        "Status: " + status + "\n\n" +
+        JSON.stringify(data, null, 2);
+}
+
+async function handleRequest(url, options = {}) {
+    try {
+        const res = await fetch(url, options);
+        const text = await res.text();
+
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch {
+            data = text;
+        }
+
+        showResponse(res.status, data);
+
+    } catch (err) {
+        showResponse("ERROR", err.message);
+    }
+}
+
+// CREATE
+function createItem() {
+    handleRequest(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: document.getElementById("post-name").value,
+            description: document.getElementById("post-desc").value
+        })
+    });
+}
+
+// GET ALL
+function getItems() {
+    handleRequest(API);
+}
+
+// GET ONE
+function getItem() {
+    const id = document.getElementById("get-id").value;
+    handleRequest(`${API}/${id}`);
+}
+
+// PUT
+function updateItem() {
+    const id = document.getElementById("put-id").value;
+
+    handleRequest(`${API}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: document.getElementById("put-name").value,
+            description: document.getElementById("put-desc").value
+        })
+    });
+}
+
+// PATCH
+function patchItem() {
+    const id = document.getElementById("patch-id").value;
+
+    const body = {};
+    const name = document.getElementById("patch-name").value;
+    const desc = document.getElementById("patch-desc").value;
+
+    if (name) body.name = name;
+    if (desc) body.description = desc;
+
+    handleRequest(`${API}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+}
+
+// DELETE
+function deleteItem() {
+    const id = document.getElementById("delete-id").value;
+
+    handleRequest(`${API}/${id}`, {
+        method: "DELETE"
+    });
+}
+</script>
+
 </body>
 </html>
