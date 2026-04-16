@@ -4,6 +4,8 @@ from supabase import create_client, Client
 import os
 from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -11,8 +13,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app = FastAPI()
 
 # Environment variables (set these in Render)
 SUPABASE_URL = os.getenv("SUPABASE_URL")
