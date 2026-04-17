@@ -52,7 +52,12 @@ def get_one(material_id: int):
 # POST
 @app.post("/inventory")
 def create_item(item: InventoryItem):
-    res = supabase.table(TABLE_NAME).insert(item.dict()).execute()
+    data = item.dict()
+
+    if data.get("purchase_date"):
+        data["purchase_date"] = data["purchase_date"].isoformat()
+
+    res = supabase.table(TABLE_NAME).insert(data).execute()
     return res.data
 
 
