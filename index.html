@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>FastAPI CRUD UI</title>
+<title>Inventory API UI</title>
 
 <style>
 body {
@@ -12,9 +12,7 @@ body {
     padding: 20px;
 }
 
-h1 {
-    color: #4CAF50;
-}
+h1 { color: #4CAF50; }
 
 .section {
     border: 1px solid #444;
@@ -52,52 +50,60 @@ pre {
     border-radius: 6px;
 }
 </style>
-
 </head>
+
 <body>
 
-<h1>🚀 FastAPI CRUD Interface</h1>
+<h1>Inventory Interface</h1>
 
 <!-- CREATE -->
 <div class="section">
-<h2>POST /items</h2>
-<input id="post-name" placeholder="Name">
-<input id="post-desc" placeholder="Description">
+<h2>POST /inventory</h2>
+<input id="material_id" placeholder="Material ID (int)">
+<input id="material_name" placeholder="Material Name">
+<input id="purchase_date" placeholder="YYYY-MM-DD">
+<input id="purchase_quantity" placeholder="Purchase Quantity">
+<input id="storage_location" placeholder="Storage Location">
+<input id="on_hand_quantity" placeholder="On Hand Quantity">
 <button class="post" onclick="createItem()">Create</button>
 </div>
 
 <!-- GET -->
 <div class="section">
-<h2>GET /items</h2>
+<h2>GET /inventory</h2>
 <button class="get" onclick="getItems()">Fetch All</button>
 
-<h3>GET /items/{id}</h3>
-<input id="get-id" placeholder="ID">
+<h3>GET /inventory/{material_id}</h3>
+<input id="get-id" placeholder="Material ID">
 <button class="get" onclick="getItem()">Fetch One</button>
 </div>
 
 <!-- PUT -->
 <div class="section">
-<h2>PUT /items/{id}</h2>
-<input id="put-id" placeholder="ID">
-<input id="put-name" placeholder="Name">
-<input id="put-desc" placeholder="Description">
+<h2>PUT /inventory/{material_id}</h2>
+<input id="put-id" placeholder="Material ID">
+<input id="put-name" placeholder="Material Name">
+<input id="put-date" placeholder="YYYY-MM-DD">
+<input id="put-qty" placeholder="Purchase Quantity">
+<input id="put-location" placeholder="Storage Location">
+<input id="put-onhand" placeholder="On Hand Quantity">
 <button class="put" onclick="updateItem()">Replace</button>
 </div>
 
 <!-- PATCH -->
 <div class="section">
-<h2>PATCH /items/{id}</h2>
-<input id="patch-id" placeholder="ID">
-<input id="patch-name" placeholder="Name (optional)">
-<input id="patch-desc" placeholder="Description (optional)">
+<h2>PATCH /inventory/{material_id}</h2>
+<input id="patch-id" placeholder="Material ID">
+<input id="patch-name" placeholder="Material Name">
+<input id="patch-qty" placeholder="Purchase Quantity">
+<input id="patch-onhand" placeholder="On Hand Quantity">
 <button class="patch" onclick="patchItem()">Update</button>
 </div>
 
 <!-- DELETE -->
 <div class="section">
-<h2>DELETE /items/{id}</h2>
-<input id="delete-id" placeholder="ID">
+<h2>DELETE /inventory/{material_id}</h2>
+<input id="delete-id" placeholder="Material ID">
 <button class="delete" onclick="deleteItem()">Delete</button>
 </div>
 
@@ -108,7 +114,7 @@ pre {
 </div>
 
 <script>
-const API = "/items";
+const API = "/inventory";
 
 function showResponse(status, data) {
     document.getElementById("output").textContent =
@@ -141,8 +147,12 @@ function createItem() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            name: document.getElementById("post-name").value,
-            description: document.getElementById("post-desc").value
+            material_id: parseInt(document.getElementById("material_id").value),
+            material_name: document.getElementById("material_name").value,
+            purchase_date: document.getElementById("purchase_date").value || null,
+            purchase_quantity: parseInt(document.getElementById("purchase_quantity").value),
+            storage_location: document.getElementById("storage_location").value,
+            on_hand_quantity: parseInt(document.getElementById("on_hand_quantity").value)
         })
     });
 }
@@ -166,8 +176,12 @@ function updateItem() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            name: document.getElementById("put-name").value,
-            description: document.getElementById("put-desc").value
+            material_id: parseInt(id),
+            material_name: document.getElementById("put-name").value,
+            purchase_date: document.getElementById("put-date").value || null,
+            purchase_quantity: parseInt(document.getElementById("put-qty").value),
+            storage_location: document.getElementById("put-location").value,
+            on_hand_quantity: parseInt(document.getElementById("put-onhand").value)
         })
     });
 }
@@ -177,11 +191,14 @@ function patchItem() {
     const id = document.getElementById("patch-id").value;
 
     const body = {};
-    const name = document.getElementById("patch-name").value;
-    const desc = document.getElementById("patch-desc").value;
+    if (document.getElementById("patch-name").value)
+        body.material_name = document.getElementById("patch-name").value;
 
-    if (name) body.name = name;
-    if (desc) body.description = desc;
+    if (document.getElementById("patch-qty").value)
+        body.purchase_quantity = parseInt(document.getElementById("patch-qty").value);
+
+    if (document.getElementById("patch-onhand").value)
+        body.on_hand_quantity = parseInt(document.getElementById("patch-onhand").value);
 
     handleRequest(`${API}/${id}`, {
         method: "PATCH",
