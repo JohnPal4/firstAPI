@@ -64,8 +64,10 @@ def create_item(item: InventoryItem):
 # PUT (full replace)
 @app.put("/inventory/{material_id}")
 def replace_item(material_id: int, item: InventoryItem):
+    data = item.model_dump(mode="json")
+
     res = supabase.table(TABLE_NAME)\
-        .update(item.dict())\
+        .update(data)\
         .eq("material_id", material_id)\
         .execute()
 
