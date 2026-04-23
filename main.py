@@ -40,6 +40,20 @@ def get_all():
     res = supabase.table(TABLE_NAME).select("*").execute()
     return res.data
 
+#SEARCH FOR FRONTEND
+@app.get("/inventory/search")
+def search_inventory(q: str = Query(..., min_length=1)):
+    res = supabase.table(TABLE_NAME)\
+        .select("*")\
+        .or_(
+            f"material_name.ilike.%{q}%,"
+            f"storage_location.ilike.%{q}%,"
+            f"cast(material_id as text).ilike.%{q}%"
+        )\
+        .execute()
+
+    return res.data
+
 
 # GET one (using material_id)
 @app.get("/inventory/{material_id}")
@@ -104,17 +118,3 @@ def delete_item(material_id: int):
         raise HTTPException(status_code=404, detail="Item not found")
 
     return {"message": "Deleted successfully"}
-
-#SEARCH FOR FRONTEND
-@app.get("/inventory/search")
-def search_inventory(q: str = Query(..., min_length=1)):
-    res = supabase.table(TABLE_NAME)\
-        .select("*")\
-        .or_(
-            f"material_name.ilike.%{q}%,"
-            f"storage_location.ilike.%{q}%,"
-            f"cast(material_id as text).ilike.%{q}%"
-        )\
-        .execute()
-
-    return res.data
