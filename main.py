@@ -33,13 +33,6 @@ def serve_home():
     with open("index.html", "r", encoding="utf-8") as f:
         return f.read()
 
-
-# GET all
-@app.get("/inventory")
-def get_all():
-    res = supabase.table(TABLE_NAME).select("*").execute()
-    return res.data
-
 #SEARCH FOR FRONTEND
 @app.get("/inventory/search")
 def search_inventory(q: str = Query(..., min_length=1)):
@@ -54,6 +47,13 @@ def search_inventory(q: str = Query(..., min_length=1)):
 
     return res.data
 
+
+# GET all
+@app.get("/inventory")
+def get_all():
+    res = supabase.table(TABLE_NAME).select("*").execute()
+    return res.data
+    
 
 # GET one (using material_id)
 @app.get("/inventory/{material_id}")
