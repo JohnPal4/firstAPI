@@ -5,6 +5,7 @@ import os
 from datetime import date
 from typing import Optional
 from fastapi.responses import HTMLResponse
+from fastapi import Query
 
 app = FastAPI()
 
@@ -103,3 +104,16 @@ def delete_item(material_id: int):
         raise HTTPException(status_code=404, detail="Item not found")
 
     return {"message": "Deleted successfully"}
+
+#SEARCH FOR FRONTEND
+@app.get("/inventory/search")
+def search_inventory(q: str = Query(..., min_length=1)):
+    res = supabase.table(TABLE_NAME)\
+        .select("*")\
+        .or_(
+            f"material_name.ilike.%{q}%,"
+            f"storage_location.ilike.%{q}%"
+        )\
+        .execute()
+
+    return res.data
