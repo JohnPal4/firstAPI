@@ -112,7 +112,8 @@ def search_inventory(q: str = Query(..., min_length=1)):
         .select("*")\
         .or_(
             f"material_name.ilike.%{q}%,"
-            f"storage_location.ilike.%{q}%"
+            f"storage_location.ilike.%{q}%,"
+            f"cast(material_id as text).ilike.%{q}%"
         )\
         .execute()
 
