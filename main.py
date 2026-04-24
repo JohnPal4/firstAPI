@@ -37,14 +37,27 @@ def serve_home():
 @app.get("/inventory/search")
 def search_inventory(q: str = Query(..., min_length=1)):
     try:
-        res = supabase.table(TABLE_NAME)\
+        results = []
+
+        # Try numeric search
+        if q.isdigit():
+            res_id = supabase.table(TABLE_NAME)\
+                .select("*")\
+                .eq("material_id", int(q))\
+                .execute()
+            results.extend(res_id.data)
+
+        # Text search
+        res_text = supabase.table(TABLE_NAME)\
             .select("*")\
             .or_(
                 f"material_name.ilike.%{q}%,storage_location.ilike.%{q}%"
             )\
             .execute()
 
-        return res.data
+        results.extend(res_text.data)
+
+        return results
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
