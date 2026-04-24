@@ -36,16 +36,18 @@ def serve_home():
 #SEARCH FOR FRONTEND
 @app.get("/inventory/search")
 def search_inventory(q: str = Query(..., min_length=1)):
-    res = supabase.table(TABLE_NAME)\
-        .select("*")\
-        .or_(
-            f"material_name.ilike.%{q}%,"
-            f"storage_location.ilike.%{q}%,"
-            f"cast(material_id as text).ilike.%{q}%"
-        )\
-        .execute()
+    try:
+        res = supabase.table(TABLE_NAME)\
+            .select("*")\
+            .or_(
+                f"material_name.ilike.%{q}%,storage_location.ilike.%{q}%"
+            )\
+            .execute()
 
-    return res.data
+        return res.data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # GET all
